@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        div {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .signup-link {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .signup-link a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .signup-link a:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>ログイン</h1>
+    <form th:action="@{/login}" method="post">
+		<!--UserServiceクラスからloadUserByUsernameを使ってUserRepositoryにアクセスし、データベースを閲覧する。名前やパスワードが一致すればログイン可能-->
+        <div>
+            <label for="username">ユーザー名：</label>
+            <input type="text" id="username" name="username" required />         
+        </div>
+        <div>
+            <label for="password">パスワード：</label>
+            <input type="password" id="password" name="password" required />
+             <!--type="password" で、文字が●●で隠れるようになる。-->
+            <!--name="password" も User クラスの password にバインドされる-->
+        </div>
+        <div>
+            <button type="submit">ログイン</button>
+        </div>
+        <div th:if="${param.error}" class="error-message">
+            <p>エラー：ユーザー名またはパスワードが間違っています。</p>
+            <!--条件付き表示で、param.error が存在するとき（= ログイン失敗時）、この<div>が表示される-->
+            <!--URLが /login?error のときに param.error が true と評価-->
+            <!--これはCSS用のクラス名。たとえば赤文字にしたり、目立たせるためのスタイルを設定するためにしようとしている-->
+        </div>
+    </form>
+    
+    <div class="signup-link">
+        <p>アカウントをお持ちでないですか？ <a th:href="@{/signup}">新規登録しましょう</a></p>
+    </div>
+</body>
+</html>        

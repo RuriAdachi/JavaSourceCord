@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>エラー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .error-container {
+            text-align: center;
+            padding: 50px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>エラーが発生しました</h1>
+        <p th:text="${message}">問題が発生しました。詳細は管理者にお問い合わせください。</p>
+        <a href="/call-logs">通話ログ一覧に戻る</a>
+    </div>
+</body>
+</html>
