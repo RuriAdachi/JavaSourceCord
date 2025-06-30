@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>通話ログ詳細</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9f5ff;
+            border-left: 5px solid #007bff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+  
+    </style>
+</head>
+<body>
+
+    <h1>通話ログ詳細</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>通話日付</th>
+                <th>ファイル名</th>
+                <th>作成日時</th>
+                <th>再生</th>
+                <th>確認</th>
+            </tr>
+        </thead>
+        <tbody>
+			
+            <tr th:each="log : ${callLogs}">
+                <td th:text="${log.calldate}"></td>
+                <td th:text="${log.filename}"></td>
+                <td th:text="${log.createdAt}"></td>
+                <td>
+				<!--実際に通話ログを1件ずつテーブルに表示したい意図があるため、callLogs が画面上で活用されている。-->
+				<!--th:action="@{/play}"：SpringのThymeleafテンプレート構文で、送信先のURL /play を指定している。-->
+                    <div class="action-buttons">
+                        <!-- 再生ボタン -->
+                        <form th:action="@{/play}" method="post">
+                            <input type="hidden" name="logId" th:value="${log.id}" />
+                            <!--logId：対象の通話ログのID。どのログを再生するかをサーバーに伝える。-->
+                            <input type="hidden" name="callmonth" th:value="${yearMonth}"/>
+   <!--callmonth：画面上で検索されていた年月（たとえば「2025-06」）を再送して、再生後に同じ月の一覧ページへ戻れるようにするための情報。-->
+                            <button type="submit" 
+    							th:disabled="${log.status != 0}">
+    							再生
+							</button>
+                        </form>
+                    </div>   
+				</td>
+				<td> <!-- 確認者ボタン -->
+                    <div th:if="${role == 2}">
+						<!--role == 2 であるときのみ、このブロック内が表示-->
+                        <form th:action="@{/updateStatus}" method="post">
+						<!--/updateStatus：ボタンを押したときにPOSTされるエンドポイント。ここでログの確認状態を更新する処理が行われる-->
+                            <input type="hidden" name="logId" th:value="${log.id}" />
+                       <!--logId：どの通話ログを対象にするかを特定するためのID。-->
+                            <input type="hidden" name="role" value="confirm" />
+                      <!--これはサーバー側で、「確認者による確認操作」だると判断するための識別値。-->
+                            <input type="hidden" name="callmonth" th:value="${yearMonth}"/>
+                      <!--再表示の際、検索された月の通話ログ一覧に戻るために使用-->
+                            <button type="submit" 
+                                th:disabled="${log.confirmed != null and log.confirmed}">
+                      <!--th:disabled：すでにlog.confirmedがtrueであれば（つまり確認済みであれば）、ボタンは無効化（押せなくなる）されます-->
+                                確認者
+                            </button>
+                        </form>
+                    </div>
+			
+                    <!-- 管理者ボタン -->
+                    <div th:if="${role == 3}">
+                        <form th:action="@{/updateStatus}" method="post">
+                            <input type="hidden" name="logId" th:value="${log.id}" />
+                            <input type="hidden" name="role" value="admin" />
+                            <input type="hidden" name="callmonth" th:value="${yearMonth}"/>
+                            <button type="submit" 
+                                th:disabled="${log.adminConfirmed != null and log.adminConfirmed}">
+                                管理者
+                            </button>
+                        </form>
+                    </div>		
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+	<!--CSV Button role == 3（管理者）を持つユーザーにのみ、このボタンが表示され、通話ログのCSVファイルをダウンロードできる仕様に-->
+				<div th:if="${role == 3}" style="color: green; margin-bottom: 10px;">
+    				<form th:action="@{/exportCsv}" method="get" target="_blank">
+			<!--ボタンを押したとき、新しいタブでCSVファイルを開くようにしています。元のページに影響を与えないように-->
+      				<input type="hidden" name="callmonth" th:value="${yearMonth}" />
+      		<!--ユーザーが検索した月（yearMonth）をCSV出力処理に渡すための 隠し入力フィールド-->
+        			<button type="submit">CSV</button>
+   				 </form>
+			</div>
+
+</form>
+
+    
+    <!-- ログアウトリンク -->
+   	<div class="logout" style="margin-bottom: 10px;">
+   	 <a th:href="@{/logout}" style="color: aqua;">ログアウト</a>
+	</div>
+    
+</body>
+</html>

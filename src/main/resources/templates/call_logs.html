@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>通話ログ管理システム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            margin-bottom: 10px;
+            display: block;
+            font-weight: bold;
+        }
+        input, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+       
+    </style>
+</head>
+<body>
+
+    <h1>通話ログ管理</h1>
+
+    <!-- フォーム1: 通話ログのアップロード -->
+    <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+        <label for="callDate">通話日付を選択してください</label>
+        <input type="date" id="callDate" name="callDate" required>
+
+        <label for="file">ファイルを選択してください</label>
+        <input type="file" id="file" name="file" accept=".csv,.txt,.xls,.xlsx,mp4" required>
+		
+		
+		<label for="itemId">商品を選択してください：</label>
+    	<select id="itemId" name="itemId" required>
+			<option value="" disabled selected>-- 商品を選択 --</option>
+        	<option th:each="item : ${items}" th:value="${item.id}" th:text="${item.itemName}"></option>
+        	<!-- callLogControllerの  @GetMapping("/call-logs")で作成したitemListをitemsという変数に代入してmodelに渡している-->
+        	<!--  itemsからitemidを取得し、サーバーに送る。送られた番号と一致する商品があればデータベースのitemNameを使用して表示-->
+    	</select>
+        <button type="submit">アップロード</button>
+        <div th:if="${message}" class="alert alert-success">
+    <p th:text="${message}"></p>
+</div>
+    </form>
+   
+
+ 	<!-- フォーム2: 通話ログ検索 -->
+ 	<!--Get送信設定、。コントローラで受け取る@RequestParam("callmonth")と一致-->
+ 	<!--ここで入力された年月（例：2025-06）が、callmonth という名前でサーバーに送られ、
+	コントローラ側の @RequestParam("callmonth") で受け取られるという流れ-->
+	<form  th:action="@{/call_check}" method="get">
+    <label for="manualCallMonth">検索したい通話日付を入力してください</label>
+   <input type="month" id="manualCallMonth" name="callmonth" required>
+    <button type="submit">検索</button>
+	</form>
+
+    <!-- ログアウトリンク -->
+   	<div class="logout" style="margin-bottom: 10px;">
+   	 <a th:href="@{/logout}" style="color: aqua;">ログアウト</a>
+	</div>
+    
+   
+</body>
+</html>
